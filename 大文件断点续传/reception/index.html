@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .progress {
+            position: relative;
+            height: 10px;
+            width: 400px;
+            background-color: #EBEEF5;
+        }
+
+        .inner-progress {
+            position: absolute;
+            height: 10px;
+            top: 0;
+            left: 0;
+            width: 0px;
+            background-color: #409EFF;
+            transition: all .3s;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="file" id="fileInput">
+    <button id="uploadBtn">上传</button>
+    <button id="pause">暂停</button>
+    <button id="resume">恢复</button>
+    <div style="margin-top: 20px;">计算文件哈希值进度（ <span id="hashmsg">0</span> ）</div>
+    <div class="progress">
+        <div class="inner-progress" id="fileHash"></div>
+    </div>
+    <div id="box">
+    </div>
+</body>
+
+</html>
+<script src="./utils.js"></script>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const hashProgress = document.getElementById('fileHash');
+    const hashmsg = document.getElementById('hashmsg');
+    const pause = document.getElementById('pause');
+    const resume = document.getElementById('resume');
+    const box = document.getElementById('box');
+    // 上传的文件
+    let muploadFile;
+    // 切片请求xhr
+    let mrequestList = [];
+    // 文件hash值
+    let mhash;
+    // 存储文件切片
+    let mfileChunkListData;
+
+    // 暂停上传
+    pause.addEventListener('click',function(){
+        mrequestList?.forEach(xhr=>xhr.abort());
+        mrequestList = []
+    });
+
+    // 恢复上传
+    resume.addEventListener('click',async function(){
+        const {uploadList=[]} = await verifyUpload(muploadFile.name,mhash);
+
+        await uploadChunks(mfileChunkListData,muploadFile.name,uploadList,box,muploadFile,mrequestList,mhash)
+    });
+
+    fileInput.addEventListener('change', function (e) {
+        muploadFile = e.target.files[0]
+    });
+
+    // 上传按钮
+    uploadBtn.addEventListener('click', async function () {
+        // 切片
+        const fileChunkList = createFileChunk(muploadFile);
+
+        mhash = await caculateHash(fileChunkList,hashmsg,hashProgress);
+
+        const {shouldUpload,uploadList=[]} = await verifyUpload(muploadFile.name,mhash);
+        if(!shouldUpload){
+            alert('秒传成功');
+            return
+        }
+        mfileChunkListData = fileChunkList.map(({ file }, index) => {
+            return {
+                // 切片
+                chunk: file,
+                hash: mhash + '-' + index,
+                index,
+                fileHash:mhash,
+                percentage:uploadList.includes(mhash + '-' + index)?100:0
+            }
+        });
+        await uploadChunks(mfileChunkListData, muploadFile.name,uploadList,box,muploadFile,mrequestList,mhash)
+    });
+
+</script>

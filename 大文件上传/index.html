@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .progress {
+            margin-top: 20px;
+            position: relative;
+            height: 10px;
+            width: 700px;
+            background-color: #EBEEF5;
+        }
+
+        .inner-progress {
+            position: absolute;
+            height: 10px;
+            top: 0;
+            left: 0;
+            width: 0px;
+            background-color: #409EFF;
+            transition: all .3s;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="file" id="fileInput">
+    <button id="uploadBtn">上传</button>
+    <div id="box">
+    </div>
+</body>
+
+</html>
+<script>
+    function request({
+        url,
+        method = 'post',
+        data,
+        headers = {},
+        onProgress = e => e
+    }) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest()
+            xhr.upload.onprogress = onProgress
+            xhr.open(method, url)
+            Object.keys(headers).forEach(key => {
+                xhr.setRequestHeader(key, headers[key])
+            })
+            xhr.send(data)
+            xhr.onload = function (e) {
+                resolve(e.target.response)
+            }
+            xhr.onerror = function (e) {
+                reject(e)
+            }
+        })
+    }
+    // 切片大小
+    const SIZE = 10 * 1024 * 1024
+    const fileInput = document.getElementById('fileInput')
+    const uploadBtn = document.getElementById('uploadBtn')
+    const box = document.getElementById('box')
+    let uploadFile
+
+    fileInput.addEventListener('change', function (e) {
+        uploadFile = e.target.files[0]
+        if (!uploadFile) {
+            return
+        }
+    })
+
+    uploadBtn.addEventListener('click', async function () {
+        // 切片
+        const fileChunkList = createFileChunk(uploadFile)
+
+        const data = fileChunkList.map(({ file }, index) => {
+            return {
+                // 切片
+                chunk: file,
+                hash: uploadFile.name + '-' + index,
+                index
+            }
+        })
+        await uploadChunks(data, uploadFile.name)
+
+        await mergeRequest(uploadFile.name)
+    })
+
+    // 生成切片
+    function createFileChunk(file, size = SIZE) {
+        const fileChunkList = []
+        let cur = 0
+        while (cur < file.size) {
+            fileChunkList.push({ file: file.slice(cur, cur + size) })
+            cur += size
+        }
+        return fileChunkList
+    }
+
+    // 上传切片
+    async function uploadChunks(data, filename) {
+        let htmlStr = ''
+        const requestList = data.map(({ chunk, hash, index }) => {
+            const formData = new FormData()
+            formData.append('chunk', chunk)
+            formData.append('hash', hash)
+            formData.append('filename', filename)
+            return { formData, index }
+        }).map(({ formData, index }) => {
+            htmlStr += `
+            <div class="progress">
+                <div class="inner-progress" id="progress-${index}"></div>
+            </div>
+            `
+            return request({
+                url: 'http://localhost:3000/uploadFile',
+                data: formData,
+                onProgress: createProgressHandler(data[index])
+            })
+        })
+        box.innerHTML = htmlStr
+        await Promise.all(requestList)
+    }
+
+    // 合并切片
+    async function mergeRequest(filename) {
+        await request({
+            url: 'http://localhost:3000/merge',
+            headers: {
+                'content-type': 'application/json'
+            },
+            data: JSON.stringify({
+                filename,
+                size: SIZE
+            })
+        })
+    }
+
+
+    // 上传进度显示
+    function createProgressHandler(item) {
+        return e => {
+            const progress = document.getElementById(`progress-${item.index}`)
+            const percentage = e.loaded / e.total;
+            progress.style.width = (700 * percentage) + 'px'
+        };
+    }
+</script>
