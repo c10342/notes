@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    实现⼀个异步求和函数
+  </body>
+</html>
+
+<script>
+  // promise链式调用
+  function add(a, b) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(a + b);
+      }, 1000);
+    });
+  }
+
+  function sum(...args) {
+    let p = Promise.resolve(0);
+    for (let i = 0; i < args.length; i++) {
+      p = p.then((res) => add(res, args[i]));
+    }
+    return p;
+  }
+
+  //   并行
+  //   function sum(...args) {
+  //     if (args.length === 1) {
+  //       return args[0];
+  //     }
+
+  //     const result = [];
+  //     for (let i = 0; i < args.length; i += 2) {
+  //       result.push(add(args[i], args[i + 1] || 0));
+  //     }
+  //     return Promise.all(result).then((res) => {
+  //       return sum(...res);
+  //     });
+  //   }
+
+  async function demo() {
+    console.time("sum");
+    const res = await sum(1, 2, 3, 4, 5);
+    console.timeEnd("sum");
+  }
+
+  demo();
+</script>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="btn">按钮</button>
+    <div id="container"></div>
+</body>
+
+</html>
+
+<script src="index.js"></script>
+
+<script>
+    const node = h('ul', {}, [
+        h('li', { key: 'A' }, 'A'),
+        h('li', { key: 'B' }, 'B'),
+        h('li', { key: 'C' }, 'C'),
+        h('li', { key: 'D' }, 'D'),
+    ])
+    // const node = h('section', {}, [
+    //     h('p',{},'1'),
+    //     h('p',{},'2')
+    // ])
+    const container = document.getElementById('container')
+    // container.nextSibling
+    // container.parentNode.removeChild
+    // 第一次上树
+    patch(container, node)
+
+    const btn = document.getElementById('btn')
+
+    btn.addEventListener('click', function () {
+        // const newNode = h('section',{},'好啊好啊')
+        // const newNode = h('section',{},[
+        //     h('h1',{},'我是新来的h1'),
+        //     h('h2',{},'我是新来的h2')
+        // ])
+        const newNode = h('ul', {}, [
+            h('li', { key: 'E' }, 'E'),
+            h('li', { key: 'A' }, 'A'),
+            h('li', { key: 'B' }, 'B'),
+            h('li', { key: 'F' }, 'F'),
+            h('li', { key: 'C' }, 'C'),
+            h('li', { key: 'D' }, 'D'),
+            h('li', { key: 'G' }, 'G'),
+        ])
+
+
+        patch(node, newNode)
+    })
+</script>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app"></div>
+    <button id="button">点击</button>
+</body>
+</html>
+<script src="utils.js"></script>
+<script src="operators.js"></script>
+<script src="effect.js"></script>
+<script src="baseHandlers.js"></script>
+<script src="reactive.js"></script>
+<script src="ref.js"></script>
+
+<script>
+    const state = reactive({name:'张三',age:12,arr:[1,2,3],other:1})
+    const name = toRef(state,'name')
+    // const name = ref({age:10,other:{a:1}})
+
+    effect(()=>{
+        // console.log('render');
+        // app.innerHTML = `name:${state.name}---age:${state.age}`
+
+        app.innerHTML = `name:${name.value}`
+    })
+
+    button.addEventListener('click',()=>{
+        // state.arr[10]=10
+        // name.value = '李四'
+        name.value +=1
+    })
+
+</script>

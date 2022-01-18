@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+
+<!-- <script>
+  var foo = function (...args) {
+    // 要求实现函数体
+  };
+  var f1 = foo(1, 2, 3);
+  f1.getValue(); // 6 输出是参数的和
+  var f2 = foo(1)(2, 3);
+  f2.getValue(); // 6
+  var f3 = foo(1)(2)(3)(4);
+  f3.getValue(); // 10
+</script> -->
+
+<script>
+  var foo = function (...args) {
+    const fn = (...arg1)=>foo(...[...arg1,...args])
+    fn.getValue = ()=>args.reduce((pre,cur)=>pre+cur,0)
+    return fn
+  };
+  var f1 = foo(1, 2, 3);
+  console.log(f1.getValue());; // 6 输出是参数的和
+  var f2 = foo(1)(2, 3);
+  console.log(f2.getValue());; // 6
+  var f3 = foo(1)(2)(3)(4);
+  console.log(f3.getValue());; // 10
+</script>

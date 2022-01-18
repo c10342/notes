@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 实现颜⾊转换 'rgb(255, 255, 255)' ->'#FFFFFF' -->
+</body>
+</html>
+
+<script>
+    const rgbStr = 'rgb(255,255,255)'
+    // 1、提取r、g、b
+    function rgb2hex(rgb){
+        const reg = /\d+/g
+        return rgb.match(reg)
+    }
+    const rgbArr = rgb2hex(rgbStr)
+    // 2、转化为16进制，不足就补0
+    function get16(arr){
+        return arr.map(item=>{
+            return Number(item).toString(16).padStart(2,'0')
+        })
+    }
+    const arr16 = get16(rgbArr)
+    // 3、拼接#
+    function conbine(arr){
+        return arr.reduce((prev,cur)=>{
+            return `${prev}${cur}`
+        },'#')
+    }
+    const str16 = conbine(arr16)
+    console.log(str16);
+</script>

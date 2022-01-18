@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="btn">给a页面发送消息</button>
+  </body>
+</html>
+<!-- <script>
+    // url传参
+  window.name = "B";
+  const btn = document.getElementById("btn");
+  btn.addEventListener("click", function () {
+    window.open("a.html#close", "A");
+  });
+  window.onbeforeunload = function () {
+    window.open("a.html#close", "A");
+  };
+</script> -->
+
+<script>
+    // postmessage
+  window.name = "B";
+  const btn = document.getElementById("btn");
+  btn.addEventListener("click", function () {
+    const targetWindow = window.opener
+    targetWindow.postMessage('我是b页面')
+  });
+  
+</script>

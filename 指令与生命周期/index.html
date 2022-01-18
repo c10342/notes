@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        属性:{{obj.m.n}}
+        <br>
+        <input type="text" v-model="obj.m.n">
+        <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul>
+    </div>
+    <button id="btn">按钮</button>
+</body>
+</html>
+<script src="observe.js"></script>
+<script src="index.js"></script>
+<script>
+const vm = new Vue({
+    el:'#app',
+    data:{
+        a:1,
+        b:23,
+        obj:{
+            m:{
+                n:2
+            }
+        }
+    },
+    watch:{
+        a(newValue,oldValue){
+            console.log(newValue,oldValue);
+        }
+    }
+})
+
+document.getElementById('btn').addEventListener('click',function(){
+    // console.log(vm.a);
+    vm.obj.m.n++
+    
+})
+</script>
